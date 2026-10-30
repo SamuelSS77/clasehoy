@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prueba Supabase</title>
+  <link rel="stylesheet" href="css/prueba.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <!-- ENCABEZADO PRINCIPAL -->
+  <header class="top-header">
+    <div class="brand-block">
+      <span class="brand-kicker">SUPABASE CRUD // MITABLA1</span>
+      <h1>TODO A MIL <span>CATÁLOGO</span></h1>
+    </div>
+    <div class="header-stats">
+      <span id="contador-productos" class="stat-pill">0 PRODUCTOS</span>
+    </div>
+  </header>
+
+  <!-- LAYOUT PRINCIPAL: FORMULARIO + CATÁLOGO -->
+  <main class="main-layout">
+    <!-- COLUMNA IZQUIERDA: FORMULARIO (CREATE / UPDATE) -->
+    <aside class="panel-formulario">
+      <form id="form-producto">
+        <div class="form-header">
+          <div>
+            <span class="form-kicker">TODO A MIL // NUEVO ITEM</span>
+            <h2>AGREGAR PRODUCTO</h2>
+          </div>
+          <div class="form-badge-circle" title="Todo a Mil">↗</div>
+        </div>
+
+        <div class="form-field full">
+          <label for="input-nombre">Nombre <span>01</span></label>
+          <input type="text" id="input-nombre" placeholder="Ej: Mandarinas" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="input-precio">Precio <span>02</span></label>
+            <input type="number" id="input-precio" placeholder="Ej: 350000" min="0" step="any" required />
+          </div>
+
+          <div class="form-field">
+            <label for="input-unidades">Unidades <span>03</span></label>
+            <input type="number" id="input-unidades" placeholder="Ej: 50" min="0" step="1" required />
+          </div>
+        </div>
+
+        <div class="form-field full">
+          <label for="input-descripcion">Descripción <span>04</span></label>
+          <input type="text" id="input-descripcion" placeholder="Ej: Fruta cítrica" />
+        </div>
+
+        <div class="form-field full">
+          <label for="input-imagen">URL de la imagen <span>05</span></label>
+          <input type="text" id="input-imagen" placeholder="https://ejemplo.com/imagen.jpg" />
+        </div>
+
+        <button type="submit" id="btn-guardar-form">
+          <span id="texto-btn-form">GUARDAR PRODUCTO</span>
+          <span class="btn-tag">$ MIL &amp; MÁS ↗</span>
+        </button>
+        <button type="button" id="btn-cancelar-edicion" class="btn-cancelar-form" style="display: none;">
+          CANCELAR EDICIÓN ✕
+        </button>
+      </form>
+
+      <div id="notificacion"></div>
+    </aside>
+
+    <!-- COLUMNA DERECHA: CATÁLOGO DE CARDS (READ / UPDATE / DELETE) -->
+    <section class="panel-catalogo">
+      <div class="catalogo-toolbar">
+        <div class="toolbar-title">
+          <span class="toolbar-kicker">INVENTARIO EN TIEMPO REAL</span>
+          <h2>PRODUCTOS REGISTRADOS</h2>
+        </div>
+        <div class="search-box">
+          <input type="search" id="input-buscar" placeholder="Buscar producto por nombre..." />
+        </div>
+      </div>
+
+      <div id="contenedor-cards" class="cards-grid"></div>
+    </section>
+  </main>
+
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/prueba.js"></script>
+</body>
+
+</html>

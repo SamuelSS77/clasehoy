@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Estudiantes | Supabase</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <header class="encabezado">
+    <h1>📚 Gestión de Estudiantes</h1>
+    <span id="estadoConexion" class="estado">Conectando...</span>
+  </header>
+
+  <main class="contenedor">
+    <!-- Formulario -->
+    <section class="tarjeta">
+      <h2 id="tituloFormulario">Nuevo estudiante</h2>
+      <form id="formEstudiante" autocomplete="off">
+        <input type="hidden" id="idEstudiante">
+
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" required placeholder="Ej: Ana Pérez">
+        </div>
+
+        <div class="campo">
+          <label for="correo">Correo</label>
+          <input type="email" id="correo" required placeholder="ana@correo.com">
+        </div>
+
+        <div class="campo">
+          <label for="curso">Curso</label>
+          <input type="text" id="curso" required placeholder="Ej: Informática 1">
+        </div>
+
+        <div class="campo">
+          <label for="edad">Edad</label>
+          <input type="number" id="edad" min="1" max="120" required>
+        </div>
+
+        <div class="acciones">
+          <button type="submit" id="btnGuardar" class="btn btn-primario">Guardar</button>
+          <button type="button" id="btnCancelar" class="btn btn-secundario oculto">Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Listado -->
+    <section class="tarjeta">
+      <div class="barra-listado">
+        <h2>Listado</h2>
+        <input type="search" id="buscar" placeholder="🔍 Buscar por nombre, correo o curso...">
+      </div>
+
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Curso</th>
+              <th>Edad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaEstudiantes">
+            <tr>
+              <td colspan="5" class="vacio">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="mensaje" class="mensaje oculto"></div>
+
+  <!-- Scripts (el orden es importante) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script> <!-- 2° -->
+  <script src="js/datos.js"></script> <!-- 3° -->
+  <script src="js/gestion.js"></script> <!-- 4° -->
+</body>
+
+</html>
