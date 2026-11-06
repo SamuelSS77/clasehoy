@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi cuenta</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <section id="panel-cuenta">
+      <h2>Mi cuenta</h2>
+      <p id="estado-sesion">No has iniciado sesión.</p>
+
+      <form id="form-registro">
+        <h3>Registrarme</h3>
+        <label for="registro-nombre">Nombre</label>
+        <input id="registro-nombre" type="text" required />
+
+        <label for="registro-correo">Correo</label>
+        <input id="registro-correo" type="email" required />
+
+        <label for="registro-password">Contraseña</label>
+        <input id="registro-password" type="password" minlength="6" required />
+
+        <button type="submit">Crear cuenta</button>
+      </form>
+
+      <form id="form-login">
+        <h3>Iniciar sesión</h3>
+        <label for="login-correo">Correo</label>
+        <input id="login-correo" type="email" required />
+
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" type="password" required />
+
+        <button type="submit">Iniciar sesión</button>
+      </form>
+
+      <button id="btn-logout" type="button">Cerrar sesión</button>
+    </section>
+
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/cliente.js"></script>
+  </body>
+</html>
