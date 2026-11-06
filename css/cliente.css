@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Liquid Glass UI para cliente.html
+   Fondo pastel con manchas de color + paneles de vidrio translúcido
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --ink: #1d1b2e;
+  --ink-soft: #5b5870;
+  --violet: #6c5ce7;
+  --violet-2: #8f7bff;
+  --teal: #5fd1c6;
+  --glass: rgba(255, 255, 255, 0.35);
+  --glass-strong: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --shadow: 0 18px 40px rgba(86, 70, 140, 0.22);
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  font-family: 'Nunito', system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 15%, #f6dcd2 0, transparent 45%),
+    radial-gradient(circle at 90% 8%, #8d98b3 0, transparent 40%),
+    radial-gradient(circle at 80% 90%, #b9a6f0 0, transparent 40%),
+    radial-gradient(circle at 15% 90%, #a8e6df 0, transparent 38%),
+    #e9dcdc;
+  background-attachment: fixed;
+}
+
+/* ---------- Panel principal de vidrio ---------- */
+#panel-cuenta {
+  width: min(100%, 520px);
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  border-radius: 36px;
+  background: linear-gradient(145deg, rgba(255,255,255,.55), rgba(255,255,255,.18));
+  border: 1.5px solid var(--glass-border);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* ---------- Estado de sesión: píldora de vidrio ---------- */
+#estado-sesion {
+  margin: 0;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: .92rem;
+  color: var(--ink-soft);
+  background: var(--glass);
+  border: 1.5px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 6px 16px rgba(86,70,140,.12);
+}
+
+/* ---------- Formularios: tarjetas con brillo iridiscente ---------- */
+form {
+  display: grid;
+  gap: 8px;
+  padding: 22px;
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(95,209,198,.28), rgba(143,123,255,.22) 60%, rgba(255,255,255,.3));
+  border: 1.5px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(86,70,140,.16), inset 0 1px 0 rgba(255,255,255,.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+label {
+  margin-top: 6px;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  padding-left: 14px;
+}
+
+/* ---------- Campos: píldoras blancas ---------- */
+input {
+  width: 100%;
+  padding: 13px 18px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,.9);
+  background: var(--glass-strong);
+  box-shadow: inset 0 2px 4px rgba(86,70,140,.08), 0 6px 14px rgba(86,70,140,.10);
+  outline: none;
+  transition: box-shadow .2s, border-color .2s;
+}
+
+input::placeholder { color: #a09db3; }
+
+input:focus {
+  border-color: var(--violet-2);
+  box-shadow: 0 0 0 4px rgba(108,92,231,.22), inset 0 2px 4px rgba(86,70,140,.06);
+}
+
+/* ---------- Botones ---------- */
+button {
+  margin-top: 12px;
+  padding: 14px 22px;
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: .01em;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,.7);
+  background: linear-gradient(180deg, var(--violet-2), var(--violet));
+  box-shadow: 0 10px 22px rgba(108,92,231,.42), inset 0 2px 0 rgba(255,255,255,.55);
+  transition: transform .15s, box-shadow .15s, filter .15s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 14px 28px rgba(108,92,231,.5), inset 0 2px 0 rgba(255,255,255,.6);
+}
+
+button:active { transform: translateY(0) scale(.98); }
+
+/* Botón de iniciar sesión: secundario turquesa */
+#form-login button[type="submit"] {
+  background: linear-gradient(180deg, #8ae6dc, var(--teal));
+  box-shadow: 0 10px 22px rgba(95,209,198,.45), inset 0 2px 0 rgba(255,255,255,.6);
+  color: #0f4a45;
+}
+
+/* Cerrar sesión: vidrio claro */
+#btn-logout {
+  color: var(--ink);
+  background: var(--glass-strong);
+  box-shadow: 0 8px 18px rgba(86,70,140,.16), inset 0 2px 0 rgba(255,255,255,.9);
+}
+
+@media (max-width: 420px) {
+  #panel-cuenta { padding: 18px; border-radius: 28px; }
+  form { padding: 18px; }
+}
