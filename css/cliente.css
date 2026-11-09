@@ -92,6 +92,19 @@ form {
   -webkit-backdrop-filter: blur(14px);
 }
 
+/* ---------- Datos del cliente ---------- */
+#info-cliente {
+  padding: 22px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, rgba(95,209,198,.28), rgba(143,123,255,.22) 60%, rgba(255,255,255,.3));
+  border: 1.5px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(86,70,140,.16), inset 0 1px 0 rgba(255,255,255,.85);
+}
+
+#info-cliente dl { margin: 0; display: grid; gap: 4px; }
+#info-cliente dt { margin-top: 8px; font-size: .82rem; font-weight: 700; color: var(--ink-soft); }
+#info-cliente dd { margin: 0; font-weight: 700; word-break: break-word; }
+
 label {
   margin-top: 6px;
   font-size: .82rem;
@@ -153,7 +166,29 @@ button:active { transform: translateY(0) scale(.98); }
   color: #0f4a45;
 }
 
-/* Cerrar sesión: vidrio claro */
+/* Engranaje: arriba a la derecha */
+#panel-cuenta { position: relative; }
+
+#btn-config {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+  background: var(--glass-strong);
+  box-shadow: 0 8px 18px rgba(86,70,140,.16), inset 0 2px 0 rgba(255,255,255,.9);
+}
+
+#btn-config:hover svg { transform: rotate(60deg); }
+#btn-config svg { transition: transform .3s; }
+
+/* Cancelar / Cerrar sesión: vidrio claro */
+.secundario,
 #btn-logout {
   color: var(--ink);
   background: var(--glass-strong);

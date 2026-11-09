@@ -9,6 +9,12 @@
   </head>
   <body>
     <section id="panel-cuenta">
+      <button id="btn-config" type="button" aria-label="Editar mis datos" title="Editar mis datos" hidden>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
       <h2>Mi cuenta</h2>
       <p id="estado-sesion">No has iniciado sesión.</p>
 
@@ -37,7 +43,36 @@
         <button type="submit">Iniciar sesión</button>
       </form>
 
-      <button id="btn-logout" type="button">Cerrar sesión</button>
+      <div id="info-cliente" hidden>
+        <h3>Datos del cliente</h3>
+        <dl>
+          <dt>Nombre</dt><dd id="dato-nombre"></dd>
+          <dt>Correo</dt><dd id="dato-correo"></dd>
+          <dt>Teléfono</dt><dd id="dato-telefono"></dd>
+          <dt>Dirección</dt><dd id="dato-direccion"></dd>
+          <dt>Ciudad</dt><dd id="dato-ciudad"></dd>
+        </dl>
+      </div>
+
+      <form id="form-editar" hidden>
+        <h3>Editar mis datos</h3>
+        <label for="editar-nombre">Nombre</label>
+        <input id="editar-nombre" type="text" required />
+
+        <label for="editar-telefono">Teléfono</label>
+        <input id="editar-telefono" type="tel" />
+
+        <label for="editar-direccion">Dirección</label>
+        <input id="editar-direccion" type="text" />
+
+        <label for="editar-ciudad">Ciudad</label>
+        <input id="editar-ciudad" type="text" />
+
+        <button type="submit">Guardar cambios</button>
+        <button id="btn-cancelar-edicion" type="button" class="secundario">Cancelar</button>
+      </form>
+
+      <button id="btn-logout" type="button" hidden>Cerrar sesión</button>
     </section>
 
     <script src="js/supabaseClient.js"></script>

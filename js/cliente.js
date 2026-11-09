@@ -132,6 +132,126 @@ document.getElementById('form-login').addEventListener('submit', async (event) =
   }
 });
 
+// Muestra u oculta los formularios y los datos del cliente según haya sesión.
+async function mostrarEstadoSesion() {
+  const estado = document.getElementById('estado-sesion');
+  const formRegistro = document.getElementById('form-registro');
+  const formLogin = document.getElementById('form-login');
+  const info = document.getElementById('info-cliente');
+  const btnLogout = document.getElementById('btn-logout');
+
+  const { data: { session } } = await db.auth.getSession();
+
+  document.getElementById('form-editar').hidden = true;
+  document.getElementById('btn-config').hidden = !session;
+
+  if (!session) {
+    estado.textContent = 'No has iniciado sesión.';
+    formRegistro.hidden = false;
+    formLogin.hidden = false;
+    info.hidden = true;
+    btnLogout.hidden = true;
+    return;
+  }
+
+  // Trae la fila del cliente cuyo id coincide con el usuario autenticado.
+  const { data: cliente, error } = await db
+    .from('cliente_prueba')
+    .select('nombre, correo, telefono, direccion, ciudad')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (error) console.log('Error al leer el perfil:', error);
+
+  formRegistro.hidden = true;
+  formLogin.hidden = true;
+  btnLogout.hidden = false;
+
+  if (!cliente) {
+    estado.textContent = 'Sesión iniciada, pero no se encontró tu perfil.';
+    info.hidden = true;
+    return;
+  }
+
+  estado.textContent = '¡Inicio de sesión exitoso! Bienvenido/a, ' + (cliente.nombre || '') + '.';
+  document.getElementById('dato-nombre').textContent = cliente.nombre || '—';
+  document.getElementById('dato-correo').textContent = cliente.correo || session.user.email;
+  document.getElementById('dato-telefono').textContent = cliente.telefono || '—';
+  document.getElementById('dato-direccion').textContent = cliente.direccion || '—';
+  document.getElementById('dato-ciudad').textContent = cliente.ciudad || '—';
+  info.hidden = false;
+  clienteActual = cliente;
+}
+
+let clienteActual = null;
+
+// UPDATE: actualiza nombre, teléfono y dirección del cliente con sesión activa.
+// El correo no se edita aquí porque es el de Auth (login).
+async function actualizarCliente(datos) {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return null;
+
+  const { data, error } = await db
+    .from('cliente_prueba')
+    .update(datos)
+    .eq('id', session.user.id)
+    .select();
+
+  if (error) {
+    console.log('Error al actualizar:', error);
+    return null;
+  }
+  // Si RLS bloquea el UPDATE, no hay error pero data llega vacío.
+  if (!data || data.length === 0) {
+    console.log('No se actualizó ninguna fila (revisa la política UPDATE de RLS).');
+    return null;
+  }
+  return data[0];
+}
+
+// Engranaje: abre/cierra el formulario con los datos actuales precargados.
+document.getElementById('btn-config').addEventListener('click', () => {
+  const form = document.getElementById('form-editar');
+  if (form.hidden) {
+    document.getElementById('editar-nombre').value = clienteActual?.nombre || '';
+    document.getElementById('editar-telefono').value = clienteActual?.telefono || '';
+    document.getElementById('editar-direccion').value = clienteActual?.direccion || '';
+    document.getElementById('editar-ciudad').value = clienteActual?.ciudad || '';
+    document.getElementById('info-cliente').hidden = true;
+    form.hidden = false;
+  } else {
+    form.hidden = true;
+    document.getElementById('info-cliente').hidden = false;
+  }
+});
+
+document.getElementById('btn-cancelar-edicion').addEventListener('click', () => {
+  document.getElementById('form-editar').hidden = true;
+  document.getElementById('info-cliente').hidden = false;
+});
+
+document.getElementById('form-editar').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const actualizado = await actualizarCliente({
+    nombre: document.getElementById('editar-nombre').value.trim(),
+    telefono: document.getElementById('editar-telefono').value.trim(),
+    direccion: document.getElementById('editar-direccion').value.trim(),
+    ciudad: document.getElementById('editar-ciudad').value.trim(),
+  });
+
+  if (actualizado) {
+    await mostrarEstadoSesion(); // recarga los datos y vuelve a la vista normal
+    document.getElementById('estado-sesion').textContent = 'Datos actualizados correctamente.';
+  } else {
+    document.getElementById('estado-sesion').textContent =
+      'No se pudieron actualizar los datos. Revisa la consola.';
+  }
+});
+
+// Al cargar la página, si ya hay una sesión guardada, la muestra.
+mostrarEstadoSesion();
+
 document.getElementById('btn-logout').addEventListener('click', async () => {
   await db.auth.signOut();
   mostrarEstadoSesion();
