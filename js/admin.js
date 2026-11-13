@@ -1,3 +1,79 @@
+document.getElementById('form-registro-admin').addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+  const form = evento.target;
+
+  const { data, error } = await db.auth.signUp({
+    email: form.elements['admin-registro-correo'].value,
+    password: form.elements['admin-registro-password'].value,
+  });
+
+  if (error) {
+    document.getElementById('estado-sesion-admin').innerText = 'Error al registrar: ' + error.message;
+    return;
+  }
+
+  const { error: errorPerfil } = await db.from('admin_prueba').insert([{
+    id: data.user.id,
+    nombre: form.elements['admin-registro-nombre'].value.trim(),
+    correo: form.elements['admin-registro-correo'].value.trim(),
+  }]);
+
+  if (errorPerfil) {
+    document.getElementById('estado-sesion-admin').innerText = 'Cuenta creada, pero falló el perfil: ' + errorPerfil.message;
+    return;
+  }
+
+  document.getElementById('estado-sesion-admin').innerText = 'Cuenta de administrador creada. Ya puedes iniciar sesión.';
+  form.reset();
+});
+
+document.getElementById('form-login-admin').addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+  const form = evento.target;
+
+  const { error } = await db.auth.signInWithPassword({
+    email: form.elements['admin-login-correo'].value,
+    password: form.elements['admin-login-password'].value,
+  });
+
+  if (error) {
+    document.getElementById('estado-sesion-admin').innerText = 'Error al iniciar sesión: ' + error.message;
+    return;
+  }
+
+  mostrarEstadoSesionAdmin();
+});
+
+async function mostrarEstadoSesionAdmin() {
+  const { data } = await db.auth.getUser();
+  const estado = document.getElementById('estado-sesion-admin');
+
+  if (!data.user) {
+    estado.innerText = 'No has iniciado sesión.';
+    return;
+  }
+
+  // Importante: tener sesión no basta — confirmamos que además exista
+  // su fila en admins_practica.
+  const { data: perfil } = await db.from('admins_practica').select('nombre').eq('id', data.user.id).single();
+  estado.innerText = perfil ? 'Sesión iniciada como ' + perfil.nombre + ' (admin).' : 'Sesión iniciada, pero sin perfil de administrador.';
+}
+
+document.getElementById('btn-logout-admin').addEventListener('click', async () => {
+  await db.auth.signOut();
+  mostrarEstadoSesionAdmin();
+});
+
+mostrarEstadoSesionAdmin();
+
+
+
+
+
+
+
+
+
 // admin.js - Gestión CRUD de productos en MITABLA1 con Supabase
 
 // Nota de clase sobre async/await y Supabase vs localStorage:
