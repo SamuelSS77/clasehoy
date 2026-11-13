@@ -1,51 +1,5 @@
-async function registrarCliente(nombre, correo, contrasena) {
-
-  // db.auth.signUp() NO toca ninguna tabla tuya todavía — habla directo con
-  // el sistema de autenticación interno de Supabase (algo así como una
-  // tabla especial, auth.users, que tú no administras a mano). Le mandas
-  // correo y contraseña, y Supabase por detrás: valida el formato del
-  // correo, guarda la contraseña de forma segura (nunca en texto plano),
-  // y crea un identificador único nuevo (un uuid) para esta persona.
-  //
-  // El resultado llega en dos partes, igual que en todas las llamadas a
-  // Supabase que ya conoces (data / error):
-  //   - data.user   → los datos del usuario recién creado. data.user.id
-  //                   es el uuid real — EL MISMO que vamos a usar como id
-  //                   en clientes_practica, dos líneas más abajo.
-  //   - data.session → si tu proyecto exige confirmar el correo antes de
-  //                   dejar entrar (ver guía, sección 7), esto llega en
-  //                   null: el usuario ya existe, pero todavía no hay
-  //                   sesión iniciada hasta que confirme.
-  const { data, error } = await db.auth.signUp({
-    email: correo,
-    password: contrasena,
-  });
-
-  // Mismo patrón de "revisar error antes de seguir" que ya usaste en el
-  // CRUD de productos — si signUp() falló (correo repetido, contraseña
-  // muy corta, etc.), ni siquiera intentamos el segundo paso.
-  if (error) {
-    console.log('Error al registrar:', error);
-    return null;
-  }
-
-  // Ahora sí tocamos una tabla tuya: clientes_practica. Este insert() es
-  // igual al que ya usaste en agregarProducto() — la única diferencia es
-  // que aquí SÍ mandamos el id a mano (data.user.id), en vez de dejar que
-  // Supabase lo autogenere, porque este id tiene que coincidir exactamente
-  // con el que Auth le acaba de asignar al usuario.
-  const { data: cliente, error: errorCliente } = await db
-    .from('cliente_prueba')
-    .insert([{ id: data.user.id, nombre, correo, rol: 'cliente' }])
-    .select();
-
-  if (errorCliente) {
-    console.log('Error al crear el perfil:', errorCliente);
-    return null;
-  }
-
-  return cliente[0];
-}
+// El registro (db.auth.signUp + perfil en cliente_prueba) está en
+// js/cuentaCliente.js → registrarCuentaCliente(), compartido con admin.html.
 
 // 'submit' es el evento que dispara un <form> cuando alguien hace clic en
 // su botón de tipo submit (o presiona Enter dentro de un campo). Por
@@ -67,20 +21,18 @@ document.getElementById('form-registro').addEventListener('submit', async (event
   // usarlo más abajo (form.reset()) sin tener que volver a buscarlo.
   const form = event.target;
 
-  const cliente = await registrarCliente(
+  const resultado = await registrarCuentaCliente(
     document.getElementById('registro-nombre').value.trim(),
     document.getElementById('registro-correo').value.trim(),
     document.getElementById('registro-password').value
   );
 
-  if (cliente) {
-    document.getElementById('estado-sesion').textContent =
-      'Cuenta creada. Ahora inicia sesión con ese correo y contraseña.';
+  if (resultado.ok) {
     form.reset(); // vacía los 3 campos del formulario, para la próxima persona
-  } else {
-    document.getElementById('estado-sesion').textContent =
-      'No se pudo crear la cuenta. Revisa la consola.';
+    alternarModoRegistro(false); // vuelve al login de cliente
+    await mostrarEstadoSesion();
   }
+  document.getElementById('estado-sesion').textContent = resultado.mensaje;
 });
 
 async function iniciarSesion(correo, contrasena) {
@@ -109,8 +61,33 @@ async function iniciarSesion(correo, contrasena) {
   // Aquí data.user también trae el id real del usuario — el mismo valor
   // que auth.uid() va a devolver dentro de cualquier política de RLS
   // mientras esta sesión siga activa.
+  //
+  // Clientes y admins comparten el mismo Auth, así que la contraseña
+  // correcta no basta: esta puerta es SOLO para cuentas con fila en
+  // cliente_prueba. Una cuenta de admin se rechaza y se cierra su sesión.
+  // Si a la cuenta le falta el perfil (registro que quedó a medias), se crea
+  // aquí; si es una cuenta de admin, se rechaza.
+  const perfil = await asegurarPerfilCliente(data.user.id);
+
+  if (perfil.estado === 'admin' || perfil.estado === 'error') {
+    await db.auth.signOut();
+    return { rechazado: true, mensaje: perfil.mensaje };
+  }
+
   return data.user;
 }
+
+// Login (por defecto) ⇄ registro de cliente
+let modoRegistro = false;
+function alternarModoRegistro(valor = !modoRegistro) {
+  modoRegistro = valor;
+  document.getElementById('btn-alternar-registro').textContent =
+    modoRegistro ? '← Ya tengo cuenta, iniciar sesión' : '¿No tienes cuenta? Regístrate';
+}
+document.getElementById('btn-alternar-registro').addEventListener('click', () => {
+  alternarModoRegistro();
+  mostrarEstadoSesion();
+});
 
 // Mismo patrón explicado en el formulario de registro: 'submit' es el
 // evento del <form>, y hay que apagar la recarga automática de página.
@@ -123,7 +100,10 @@ document.getElementById('form-login').addEventListener('submit', async (event) =
     document.getElementById('login-password').value
   );
 
-  if (usuario) {
+  if (usuario?.rechazado) {
+    await mostrarEstadoSesion();
+    document.getElementById('estado-sesion').textContent = usuario.mensaje;
+  } else if (usuario) {
     form.reset();
     mostrarEstadoSesion(); // definida en la sección 5
   } else {
@@ -145,10 +125,12 @@ async function mostrarEstadoSesion() {
   document.getElementById('form-editar').hidden = true;
   document.getElementById('btn-config').hidden = !session;
 
+  document.getElementById('btn-alternar-registro').hidden = !!session;
+
   if (!session) {
     estado.textContent = 'No has iniciado sesión.';
-    formRegistro.hidden = false;
-    formLogin.hidden = false;
+    formRegistro.hidden = !modoRegistro;
+    formLogin.hidden = modoRegistro;
     info.hidden = true;
     btnLogout.hidden = true;
     return;
@@ -168,8 +150,11 @@ async function mostrarEstadoSesion() {
   btnLogout.hidden = false;
 
   if (!cliente) {
-    estado.textContent = 'Sesión iniciada, pero no se encontró tu perfil.';
+    // La sesión es compartida con admin.html: puede ser un admin logueado allá
+    estado.textContent =
+      'Tienes una sesión de administrador activa. Esta área es solo para clientes: cierra sesión para entrar como cliente.';
     info.hidden = true;
+    document.getElementById('btn-config').hidden = true;
     return;
   }
 

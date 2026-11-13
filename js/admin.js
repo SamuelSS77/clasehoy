@@ -23,16 +23,22 @@ document.getElementById('form-registro-admin').addEventListener('submit', async 
     return;
   }
 
-  document.getElementById('estado-sesion-admin').innerText = 'Cuenta de administrador creada. Ya puedes iniciar sesión.';
   form.reset();
+  // Tras registrarse se vuelve al login de administrador
+  modoRegistro = false;
+  await mostrarEstadoSesionAdmin();
+  if (!data.session) {
+    document.getElementById('estado-sesion-admin').innerText =
+      'Cuenta de administrador creada. Ya puedes iniciar sesión.';
+  }
 });
 
 document.getElementById('form-login-admin').addEventListener('submit', async (evento) => {
   evento.preventDefault();
   const form = evento.target;
 
-  const { error } = await db.auth.signInWithPassword({
-    email: form.elements['admin-login-correo'].value,
+  const { data, error } = await db.auth.signInWithPassword({
+    email: form.elements['admin-login-correo'].value.trim(),
     password: form.elements['admin-login-password'].value,
   });
 
@@ -41,23 +47,142 @@ document.getElementById('form-login-admin').addEventListener('submit', async (ev
     return;
   }
 
+  // Clientes y admins comparten Auth: esta puerta es SOLO para cuentas con
+  // fila en admin_prueba. Una cuenta de cliente se rechaza y se cierra.
+  const { data: perfil } = await db.from('admin_prueba').select('id').eq('id', data.user.id).maybeSingle();
+  if (!perfil) {
+    await db.auth.signOut();
+    await mostrarEstadoSesionAdmin();
+    document.getElementById('estado-sesion-admin').innerText =
+      'Esa cuenta es de cliente, no de administrador. Usa la pestaña CLIENTE.';
+    return;
+  }
+
+  form.reset();
   mostrarEstadoSesionAdmin();
 });
+
+// ----- CLIENTES: registro e inicio de sesión (tabla cliente_prueba) -----
+document.getElementById('form-registro-cliente').addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+  const form = evento.target;
+  // Registro compartido con cliente.html (js/cuentaCliente.js): crea la
+  // cuenta o, si el correo ya existía sin perfil, la repara.
+  const resultado = await registrarCuentaCliente(
+    form.elements['cliente-registro-nombre'].value.trim(),
+    form.elements['cliente-registro-correo'].value.trim(),
+    form.elements['cliente-registro-password'].value
+  );
+
+  if (resultado.ok) {
+    form.reset();
+    modoRegistro = false; // vuelve al login de cliente
+    await mostrarEstadoSesionAdmin();
+  }
+  document.getElementById('estado-sesion-admin').innerText = resultado.mensaje;
+});
+
+document.getElementById('form-login-cliente').addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+  const form = evento.target;
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email: form.elements['cliente-login-correo'].value.trim(),
+    password: form.elements['cliente-login-password'].value,
+  });
+
+  if (error) {
+    document.getElementById('estado-sesion-admin').innerText = 'Error al iniciar sesión: ' + error.message;
+    return;
+  }
+
+  // Esta puerta es SOLO para clientes: si al perfil le falta la fila en
+  // cliente_prueba se crea (cuenta a medias); si es de admin, se rechaza.
+  const perfil = await asegurarPerfilCliente(data.user.id);
+  if (perfil.estado === 'admin' || perfil.estado === 'error') {
+    await db.auth.signOut();
+    await mostrarEstadoSesionAdmin();
+    document.getElementById('estado-sesion-admin').innerText =
+      perfil.estado === 'admin' ? 'Esa cuenta es de administrador. Usa la pestaña ADMIN.' : perfil.mensaje;
+    return;
+  }
+
+  form.reset();
+  mostrarEstadoSesionAdmin();
+});
+
+// Pestaña activa: 'cliente' (por defecto) o 'admin'; dentro de cada una, login ⇄ registro
+let tipoAcceso = 'cliente';
+let modoRegistro = false;
 
 async function mostrarEstadoSesionAdmin() {
   const { data } = await db.auth.getUser();
   const estado = document.getElementById('estado-sesion-admin');
 
-  if (!data.user) {
-    estado.innerText = 'No has iniciado sesión.';
-    return;
+  // Tener sesión no basta — se busca de qué tipo es la cuenta (admin o cliente)
+  let perfilAdmin = null;
+  let perfilCliente = null;
+  if (data.user) {
+    perfilAdmin = (await db.from('admin_prueba').select('nombre').eq('id', data.user.id).maybeSingle()).data;
+    if (!perfilAdmin) {
+      perfilCliente = (await db.from('cliente_prueba').select('nombre').eq('id', data.user.id).maybeSingle()).data;
+    }
   }
 
-  // Importante: tener sesión no basta — confirmamos que además exista
-  // su fila en admins_practica.
-  const { data: perfil } = await db.from('admins_practica').select('nombre').eq('id', data.user.id).single();
-  estado.innerText = perfil ? 'Sesión iniciada como ' + perfil.nombre + ' (admin).' : 'Sesión iniciada, pero sin perfil de administrador.';
+  const haySesion = Boolean(data.user);
+  // Puerta de entrada: solo un admin comprobado ve la gestión de productos
+  document.body.classList.toggle('sesion-admin', Boolean(perfilAdmin));
+  document.body.classList.toggle('sesion-iniciada', haySesion);
+  document.getElementById('btn-logout-admin').hidden = !haySesion;
+
+  // Pestañas
+  const esCliente = tipoAcceso === 'cliente';
+  document.getElementById('tab-cliente').classList.toggle('activa', esCliente);
+  document.getElementById('tab-admin').classList.toggle('activa', !esCliente);
+  document.getElementById('tab-cliente').setAttribute('aria-selected', esCliente);
+  document.getElementById('tab-admin').setAttribute('aria-selected', !esCliente);
+
+  // Sin sesión: solo se ve el formulario de la pestaña y modo actuales
+  document.getElementById('form-login-cliente').hidden = haySesion || !esCliente || modoRegistro;
+  document.getElementById('form-registro-cliente').hidden = haySesion || !esCliente || !modoRegistro;
+  document.getElementById('form-login-admin').hidden = haySesion || esCliente || modoRegistro;
+  document.getElementById('form-registro-admin').hidden = haySesion || esCliente || !modoRegistro;
+
+  const btnAlternar = document.getElementById('btn-alternar-registro');
+  btnAlternar.hidden = haySesion;
+  btnAlternar.innerText = modoRegistro
+    ? '← Volver a iniciar sesión'
+    : (esCliente ? '¿No tienes cuenta? Regístrate' : '¿Nuevo administrador? Registrarse');
+
+  const sufijo = esCliente ? 'CLIENTE' : 'ADMIN';
+  document.getElementById('acceso-titulo').innerText = (modoRegistro ? 'REGISTRO · ' : 'INICIAR SESIÓN · ') + sufijo;
+  document.getElementById('acceso-kicker').innerText =
+    esCliente ? 'ROUGH STREET // CLIENTES' : 'ROUGH STREET // SOLO ADMINISTRADORES';
+
+  if (!haySesion) {
+    estado.innerText = 'No has iniciado sesión.';
+  } else if (perfilAdmin) {
+    estado.innerText = 'Sesión iniciada como ' + perfilAdmin.nombre + ' (admin).';
+  } else if (perfilCliente) {
+    estado.innerText = 'Sesión iniciada como ' + perfilCliente.nombre + ' (cliente).';
+  } else {
+    estado.innerText = 'Sesión iniciada, pero no se encontró tu perfil.';
+  }
 }
+
+function cambiarPestana(tipo) {
+  tipoAcceso = tipo;
+  modoRegistro = false;
+  mostrarEstadoSesionAdmin();
+}
+document.getElementById('tab-cliente').addEventListener('click', () => cambiarPestana('cliente'));
+document.getElementById('tab-admin').addEventListener('click', () => cambiarPestana('admin'));
+
+// El botón alterna entre el login (por defecto) y el formulario de registro
+document.getElementById('btn-alternar-registro').addEventListener('click', () => {
+  modoRegistro = !modoRegistro;
+  mostrarEstadoSesionAdmin();
+});
 
 document.getElementById('btn-logout-admin').addEventListener('click', async () => {
   await db.auth.signOut();
@@ -384,6 +509,14 @@ if (inputBuscar) {
 async function verificarAdmin() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return false;   // visitante sin sesión → público
+
+  // Admin registrado desde el login de esta página (tabla admin_prueba)
+  const { data: perfilAdmin } = await supabaseClient
+    .from('admin_prueba')
+    .select('id')
+    .eq('id', session.user.id)
+    .maybeSingle();
+  if (perfilAdmin) return true;
 
   // La sesión la comparte cliente.html (mismo sitio), así que si el admin
   // inició sesión allá, aquí también aparece. Leemos su rol de cliente_prueba.

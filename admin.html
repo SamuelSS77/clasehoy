@@ -23,6 +23,81 @@
     </div>
   </header>
 
+  <!-- ACCESO: primero el de clientes; la pestaña ADMIN cambia al de administradores.
+       En cada uno, primero el login y el botón alterna con el registro -->
+  <section id="zona-acceso-admin" class="acceso-admin">
+    <div class="acceso-card">
+      <div class="acceso-tabs" role="tablist">
+        <button id="tab-cliente" type="button" role="tab" class="acceso-tab activa" aria-selected="true">CLIENTE</button>
+        <button id="tab-admin" type="button" role="tab" class="acceso-tab" aria-selected="false">ADMIN</button>
+      </div>
+      <span id="acceso-kicker" class="acceso-kicker">ROUGH STREET // CLIENTES</span>
+      <h2 id="acceso-titulo">INICIAR SESIÓN · CLIENTE</h2>
+      <p id="estado-sesion-admin" role="status">No has iniciado sesión.</p>
+
+      <!-- CLIENTES (tabla cliente_prueba) -->
+      <form id="form-login-cliente">
+        <div class="form-field">
+          <label for="cliente-login-correo">Correo</label>
+          <input id="cliente-login-correo" type="email" autocomplete="email" required>
+        </div>
+        <div class="form-field">
+          <label for="cliente-login-password">Contraseña</label>
+          <input id="cliente-login-password" type="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn-acceso">ENTRAR ↗</button>
+      </form>
+
+      <form id="form-registro-cliente" hidden>
+        <div class="form-field">
+          <label for="cliente-registro-nombre">Nombre</label>
+          <input id="cliente-registro-nombre" type="text" autocomplete="name" required>
+        </div>
+        <div class="form-field">
+          <label for="cliente-registro-correo">Correo</label>
+          <input id="cliente-registro-correo" type="email" autocomplete="email" required>
+        </div>
+        <div class="form-field">
+          <label for="cliente-registro-password">Contraseña</label>
+          <input id="cliente-registro-password" type="password" minlength="6" autocomplete="new-password" required>
+        </div>
+        <button type="submit" class="btn-acceso">CREAR CUENTA ↗</button>
+      </form>
+
+      <!-- ADMINISTRADORES (tabla admin_prueba) -->
+      <form id="form-login-admin" hidden>
+        <div class="form-field">
+          <label for="admin-login-correo">Correo</label>
+          <input id="admin-login-correo" type="email" autocomplete="email" required>
+        </div>
+        <div class="form-field">
+          <label for="admin-login-password">Contraseña</label>
+          <input id="admin-login-password" type="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn-acceso">ENTRAR ↗</button>
+      </form>
+
+      <form id="form-registro-admin" hidden>
+        <div class="form-field">
+          <label for="admin-registro-nombre">Nombre</label>
+          <input id="admin-registro-nombre" type="text" autocomplete="name" required>
+        </div>
+        <div class="form-field">
+          <label for="admin-registro-correo">Correo</label>
+          <input id="admin-registro-correo" type="email" autocomplete="email" required>
+        </div>
+        <div class="form-field">
+          <label for="admin-registro-password">Contraseña</label>
+          <input id="admin-registro-password" type="password" minlength="6" autocomplete="new-password" required>
+        </div>
+        <button type="submit" class="btn-acceso">CREAR CUENTA ↗</button>
+      </form>
+
+      <button id="btn-alternar-registro" type="button" class="btn-link-acceso">¿No tienes cuenta? Regístrate</button>
+      <button id="btn-logout-admin" type="button" class="btn-link-acceso" hidden>CERRAR SESIÓN ✕</button>
+    </div>
+  </section>
+
   <!-- LAYOUT PRINCIPAL: FORMULARIO + CATÁLOGO -->
   <main class="main-layout">
     <!-- COLUMNA IZQUIERDA: FORMULARIO (CREATE / UPDATE) -->
@@ -133,6 +208,7 @@
   </main>
 
   <script src="js/supabaseClient.js"></script>
+  <script src="js/cuentaCliente.js"></script>
   <script src="js/admin.js"></script>
 </body>
 

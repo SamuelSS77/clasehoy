@@ -5,45 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mi cuenta | Rough Street</title>
     <link rel="stylesheet" href="css/cliente.css" />
+    <link rel="stylesheet" href="css/tienda.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
   <body>
-
-
-
-<section id="zona-acceso-admin">
-  <p id="estado-sesion-admin" role="status">No has iniciado sesión.</p>
-
-  <form id="form-registro-admin">
-    <h3>Registrar administrador</h3>
-    <label for="admin-registro-nombre">Nombre</label>
-    <input id="admin-registro-nombre" type="text" required>
-
-    <label for="admin-registro-correo">Correo</label>
-    <input id="admin-registro-correo" type="email" required>
-
-    <label for="admin-registro-password">Contraseña</label>
-    <input id="admin-registro-password" type="password" minlength="6" required>
-
-    <button type="submit">Crear cuenta de administrador</button>
-  </form>
-
-  <form id="form-login-admin">
-    <h3>Iniciar sesión</h3>
-    <label for="admin-login-correo">Correo</label>
-    <input id="admin-login-correo" type="email" required>
-
-    <label for="admin-login-password">Contraseña</label>
-    <input id="admin-login-password" type="password" required>
-
-    <button type="submit">Iniciar sesión</button>
-  </form>
-</section>
-
-<button id="btn-logout-admin" type="button" hidden>Cerrar sesión</button>
-
-
-
     <section id="panel-cuenta">
       <button id="btn-config" type="button" aria-label="Editar mis datos" title="Editar mis datos" hidden>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -55,10 +20,21 @@
       <h2>Mi cuenta</h2>
       <p id="estado-sesion">No has iniciado sesión.</p>
 
-      <form id="form-registro">
-        <h3>Registrarme</h3>
+      <form id="form-login">
+        <h3>Iniciar sesión · Cliente</h3>
+        <label for="login-correo">Correo</label>
+        <input id="login-correo" type="email" autocomplete="email" required />
+
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" type="password" autocomplete="current-password" required />
+
+        <button type="submit">Iniciar sesión</button>
+      </form>
+
+      <form id="form-registro" hidden>
+        <h3>Crear cuenta de cliente</h3>
         <label for="registro-nombre">Nombre</label>
-        <input id="registro-nombre" type="text" required />
+        <input id="registro-nombre" type="text" autocomplete="name" required />
 
         <label for="registro-correo">Correo</label>
         <input id="registro-correo" type="email" required />
@@ -69,16 +45,7 @@
         <button type="submit">Crear cuenta</button>
       </form>
 
-      <form id="form-login">
-        <h3>Iniciar sesión</h3>
-        <label for="login-correo">Correo</label>
-        <input id="login-correo" type="email" required />
-
-        <label for="login-password">Contraseña</label>
-        <input id="login-password" type="password" required />
-
-        <button type="submit">Iniciar sesión</button>
-      </form>
+      <button id="btn-alternar-registro" type="button" class="secundario">¿No tienes cuenta? Regístrate</button>
 
       <div id="info-cliente" hidden>
         <h3>Datos del cliente</h3>
@@ -112,9 +79,37 @@
       <button id="btn-logout" type="button" hidden>Cerrar sesión</button>
 
       <a href="admin.html" class="link-catalogo">← VER CATÁLOGO DE SNEAKERS</a>
+      <a href="admin.html#zona-acceso-admin" id="link-acceso-admin" class="link-catalogo">¿Eres administrador? Entra por aquí ↗</a>
+    </section>
+
+    <!-- PRODUCTOS TIENDA: mismas fichas del catálogo, pero con cantidad + carrito -->
+    <section id="tienda" aria-labelledby="tienda-titulo">
+      <div class="tienda-header">
+        <div>
+          <span class="brand-kicker">ROUGH STREET // TIENDA</span>
+          <h2 id="tienda-titulo">Productos tienda</h2>
+        </div>
+        <input type="search" id="tienda-buscar" placeholder="Buscar por modelo o marca..." aria-label="Buscar productos" />
+      </div>
+
+      <div class="tienda-layout">
+        <div id="contenedor-tienda" class="cards-grid"></div>
+
+        <aside id="carrito" aria-labelledby="carrito-titulo">
+          <h3 id="carrito-titulo">Carrito <span id="carrito-contador">0</span></h3>
+          <ul id="carrito-lista"></ul>
+          <div class="carrito-total">
+            <span>TOTAL COP</span>
+            <span id="carrito-total">$0</span>
+          </div>
+          <button id="btn-vaciar-carrito" type="button">VACIAR CARRITO ✕</button>
+        </aside>
+      </div>
     </section>
 
     <script src="js/supabaseClient.js"></script>
+    <script src="js/cuentaCliente.js"></script>
     <script src="js/cliente.js"></script>
+    <script src="js/tienda.js"></script>
   </body>
 </html>
