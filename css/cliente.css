@@ -1,6 +1,6 @@
 /* ==========================================================================
    ROUGH STREET // Mi cuenta (cliente.html)
-   Mismo lenguaje visual que prueba.css: negro asfalto + hueso + naranja señal,
+   Mismo lenguaje visual que admin.css: negro asfalto + hueso + naranja señal,
    esquinas recortadas, tipografía condensada y etiquetas monoespaciadas.
    ========================================================================== */
 
@@ -214,7 +214,7 @@ button:active { transform: translateY(0); }
 
 #btn-logout { color: #ff9b9b; border-color: rgba(255, 155, 155, 0.4); }
 
-/* ---------- Engranaje: arriba a la derecha (círculo ↗ de prueba.html) ---------- */
+/* ---------- Engranaje: arriba a la derecha (círculo ↗ de admin.html) ---------- */
 #btn-config {
   position: absolute;
   top: 22px;

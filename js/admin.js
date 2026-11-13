@@ -1,4 +1,4 @@
-// prueba.js - Gestión CRUD de productos en MITABLA1 con Supabase
+// admin.js - Gestión CRUD de productos en MITABLA1 con Supabase
 
 // Nota de clase sobre async/await y Supabase vs localStorage:
 // "async" convierte una función en ASÍNCRONA: una función que PUEDE usar "await"

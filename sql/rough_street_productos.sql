@@ -40,7 +40,7 @@ values
 
 -- -------------------------------------------------------------
 -- OPCIONAL: hoy la clave anónima (anon) solo puede LEER MITABLA1.
--- Si quieres que el formulario de prueba.html pueda crear, editar
+-- Si quieres que el formulario de admin.html pueda crear, editar
 -- y borrar sin iniciar sesión, descomenta estas políticas.
 -- (Solo para práctica: cualquiera con la anon key podría modificar el catálogo.)
 -- -------------------------------------------------------------
