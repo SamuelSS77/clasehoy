@@ -34,6 +34,33 @@ async function agregarProducto(datos) {
 // Variable para saber si el formulario está creando (null) o editando un ID existente
 let idProductoEditando = null;
 let ultimoErrorUpdate = '';
+// true solo si hay sesión iniciada y el rol en cliente_prueba es 'admin'
+let esAdmin = false;
+
+// =============================================
+// Utilidades de Rough Street (conversión entre el formulario y Supabase)
+// =============================================
+// "Skate / Lifestyle"  ->  ["Skate", "Lifestyle"]   (columna categoria, tipo json)
+function textoACategorias(texto) {
+  const lista = texto.split('/').map(t => t.trim()).filter(Boolean);
+  return lista.length ? lista : null;
+}
+
+// "7, 7.5, 8"  ->  [7, 7.5, 8]   (columna tallas_us, tipo jsonb)
+function textoATallas(texto) {
+  const lista = texto.split(',').map(t => Number(t.trim())).filter(n => !Number.isNaN(n) && n > 0);
+  return lista.length ? lista : null;
+}
+
+// Evita que comillas o < > de un nombre rompan el HTML de las cards
+function escaparHTML(valor) {
+  return String(valor ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 // Función para mostrar notificación y hacerla visible
 function mostrarNotificacion(mensaje) {
@@ -47,11 +74,20 @@ document.getElementById('form-producto').addEventListener('submit', async (e) =>
 
   const btnGuardar = document.getElementById('btn-guardar-form');
   const textoBtn = document.getElementById('texto-btn-form');
+  const unidades = Number(document.getElementById('input-unidades').value) || 0;
   const datosFormulario = {
+    marca: document.getElementById('input-marca').value.trim(),
+    sku: document.getElementById('input-sku').value.trim() || null,
     Nombre: document.getElementById('input-nombre').value.trim(),
+    colorway: document.getElementById('input-colorway').value.trim() || null,
+    categoria: textoACategorias(document.getElementById('input-categoria').value),
     precio: Number(document.getElementById('input-precio').value) || 0,
+    precio_usd: Number(document.getElementById('input-precio-usd').value) || null,
+    unidades: unidades,
+    disponible: unidades > 0,
+    badge: document.getElementById('input-badge').value.trim() || null,
+    tallas_us: textoATallas(document.getElementById('input-tallas').value),
     descripcion: document.getElementById('input-descripcion').value.trim(),
-    unidades: Number(document.getElementById('input-unidades').value) || 0,
     image_url: document.getElementById('input-imagen').value.trim() || null
   };
 
@@ -92,7 +128,7 @@ document.getElementById('form-producto').addEventListener('submit', async (e) =>
   } finally {
     btnGuardar.disabled = false;
     if (idProductoEditando === null) {
-      textoBtn.textContent = 'GUARDAR PRODUCTO';
+      textoBtn.textContent = 'GUARDAR SNEAKER';
     }
   }
 });
@@ -100,14 +136,21 @@ document.getElementById('form-producto').addEventListener('submit', async (e) =>
 // Función auxiliar para cargar un producto en el formulario y editarlo
 function cargarProductoEnFormulario(producto) {
   idProductoEditando = producto.id;
+  document.getElementById('input-marca').value = producto.marca ?? '';
+  document.getElementById('input-sku').value = producto.sku ?? '';
   document.getElementById('input-nombre').value = producto.Nombre ?? '';
+  document.getElementById('input-colorway').value = producto.colorway ?? '';
+  document.getElementById('input-categoria').value = Array.isArray(producto.categoria) ? producto.categoria.join(' / ') : '';
   document.getElementById('input-precio').value = producto.precio ?? 0;
+  document.getElementById('input-precio-usd').value = producto.precio_usd ?? '';
   document.getElementById('input-unidades').value = producto.unidades ?? 0;
+  document.getElementById('input-badge').value = producto.badge ?? '';
+  document.getElementById('input-tallas').value = Array.isArray(producto.tallas_us) ? producto.tallas_us.join(', ') : '';
   document.getElementById('input-descripcion').value = producto.descripcion ?? '';
   document.getElementById('input-imagen').value = producto.image_url ?? '';
 
-  document.querySelector('#form-producto .form-kicker').textContent = `TODO A MIL // EDITANDO ID #${producto.id}`;
-  document.querySelector('#form-producto h2').textContent = 'MODIFICAR PRODUCTO';
+  document.querySelector('#form-producto .form-kicker').textContent = `ROUGH STREET // EDITANDO ID #${producto.id}`;
+  document.querySelector('#form-producto h2').textContent = 'MODIFICAR SNEAKER';
   document.getElementById('texto-btn-form').textContent = 'GUARDAR CAMBIOS';
   document.getElementById('btn-cancelar-edicion').style.display = 'block';
 
@@ -117,9 +160,9 @@ function cargarProductoEnFormulario(producto) {
 function salirModoEdicion() {
   idProductoEditando = null;
   document.getElementById('form-producto').reset();
-  document.querySelector('#form-producto .form-kicker').textContent = 'TODO A MIL // NUEVO ITEM';
-  document.querySelector('#form-producto h2').textContent = 'AGREGAR PRODUCTO';
-  document.getElementById('texto-btn-form').textContent = 'GUARDAR PRODUCTO';
+  document.querySelector('#form-producto .form-kicker').textContent = 'ROUGH STREET // NUEVO DROP';
+  document.querySelector('#form-producto h2').textContent = 'AGREGAR SNEAKER';
+  document.getElementById('texto-btn-form').textContent = 'GUARDAR SNEAKER';
   document.getElementById('btn-cancelar-edicion').style.display = 'none';
 }
 
@@ -152,38 +195,53 @@ async function mostrarProductosEnCards(listaFiltrada = null) {
 
   if (contador) {
     const total = data ? data.length : 0;
-    contador.textContent = `${total} ${total === 1 ? 'PRODUCTO' : 'PRODUCTOS'}`;
+    contador.textContent = `${total} ${total === 1 ? 'PAR' : 'PARES'}`;
   }
 
   if (!data || data.length === 0) {
-    contenedor.innerHTML = '<p class="estado-cards">No se encontraron productos.</p>';
+    contenedor.innerHTML = '<p class="estado-cards">No se encontraron sneakers.</p>';
     return;
   }
 
   contenedor.innerHTML = data.map(producto => {
+    const nombre = escaparHTML(producto.Nombre || 'Sin nombre');
     const imagen = producto.image_url
-      ? `<img src="${producto.image_url}" alt="${producto.Nombre}" class="card-img" />`
-      : `<div class="card-img-placeholder">TODO A MIL // SIN IMAGEN</div>`;
+      ? `<img src="${escaparHTML(producto.image_url)}" alt="${nombre}" class="card-img" loading="lazy" />`
+      : `<div class="card-img-placeholder">ROUGH STREET // SIN IMAGEN</div>`;
 
     const precioFormateado = Number(producto.precio || 0).toLocaleString('es-CO');
+    const precioUsd = producto.precio_usd ? `US$${Number(producto.precio_usd).toLocaleString('en-US')}` : '';
     const unidadesActuales = producto.unidades ?? 0;
+    const stockTexto = unidadesActuales === 0 ? 'AGOTADO' : unidadesActuales <= 8 ? `ÚLTIMOS ${unidadesActuales}` : `${unidadesActuales} PARES`;
+
+    const badge = producto.badge ? `<span class="card-badge">${escaparHTML(producto.badge)}</span>` : '';
+    const estilos = Array.isArray(producto.categoria) ? producto.categoria.join(' / ') : '';
+    const meta = [producto.marca, estilos].filter(Boolean).map(escaparHTML).join(' · ');
+    const tallas = Array.isArray(producto.tallas_us) && producto.tallas_us.length
+      ? `<div class="card-tallas">${producto.tallas_us.map(t => `<span>${escaparHTML(t)}</span>`).join('')}</div>`
+      : '';
 
     return `
       <article class="producto-card" data-id="${producto.id}">
         <div class="card-top-bar">
-          <span class="card-id">ID #${producto.id}</span>
-          <span class="card-stock">${unidadesActuales} UNDS</span>
+          <span class="card-id">${escaparHTML(producto.sku || 'ID #' + producto.id)}</span>
+          <span class="card-stock${unidadesActuales <= 8 ? ' card-stock-bajo' : ''}">${stockTexto}</span>
         </div>
         <div class="card-media">
+          ${badge}
           ${imagen}
         </div>
         <div class="card-body">
-          <h3 class="card-titulo">${producto.Nombre || 'Sin nombre'}</h3>
-          <p class="card-desc">${producto.descripcion || 'Sin descripción'}</p>
+          ${meta ? `<span class="card-meta">${meta}</span>` : ''}
+          <h3 class="card-titulo">${nombre}</h3>
+          ${producto.colorway ? `<span class="card-colorway">${escaparHTML(producto.colorway)}</span>` : ''}
+          <p class="card-desc">${escaparHTML(producto.descripcion || 'Sin descripción')}</p>
+          ${tallas}
           <div class="card-footer">
             <span class="card-precio">$${precioFormateado}</span>
-            <span class="card-arrow">↗</span>
+            <span class="card-precio-usd">${precioUsd}</span>
           </div>
+          ${esAdmin ? `
           <div class="card-actions">
             <button type="button" class="btn-card btn-editar" data-id="${producto.id}">
               EDITAR
@@ -191,7 +249,7 @@ async function mostrarProductosEnCards(listaFiltrada = null) {
             <button type="button" class="btn-card btn-eliminar" data-id="${producto.id}">
               ELIMINAR
             </button>
-          </div>
+          </div>` : ''}
         </div>
       </article>
     `;
@@ -241,8 +299,42 @@ if (inputBuscar) {
   });
 }
 
-// Cargar el catálogo de Cards automáticamente al abrir la página
-mostrarProductosEnCards();
+// =============================================
+// MODO ADMIN — solo el admin ve el formulario y los botones EDITAR / ELIMINAR
+// =============================================
+// ⚠️ Ocultar botones es solo VISUAL. La protección real son las políticas RLS
+// de MITABLA1 en Supabase: aunque alguien muestre los botones desde la consola
+// del navegador, Supabase rechaza el INSERT / UPDATE / DELETE si no es admin.
+async function verificarAdmin() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return false;   // visitante sin sesión → público
+
+  // La sesión la comparte cliente.html (mismo sitio), así que si el admin
+  // inició sesión allá, aquí también aparece. Leemos su rol de cliente_prueba.
+  const { data, error } = await supabaseClient
+    .from('cliente_prueba')
+    .select('rol')
+    .eq('id', session.user.id)
+    .single();
+
+  if (error || !data) return false;
+  return data.rol === 'admin';
+}
+
+async function aplicarModoAdmin() {
+  esAdmin = await verificarAdmin();
+  document.body.classList.toggle('modo-admin', esAdmin);
+  if (!esAdmin && idProductoEditando !== null) salirModoEdicion();
+  await mostrarProductosEnCards();
+}
+
+// Si alguien inicia o cierra sesión en otra pestaña, se vuelve a revisar el rol
+supabaseClient.auth.onAuthStateChange((evento) => {
+  if (evento === 'SIGNED_IN' || evento === 'SIGNED_OUT') aplicarModoAdmin();
+});
+
+// Al abrir la página: primero se revisa si es admin y luego se cargan las Cards
+aplicarModoAdmin();
 
 
 // =============================================
@@ -261,13 +353,17 @@ async function buscarProductoPorId(id) {
 }
 
 async function buscarProductosPorNombre(texto) {
+  // quitamos comas y paréntesis porque .or() los usa como separadores
+  const limpio = texto.replace(/[,()]/g, ' ');
   const { data, error } = await supabaseClient
     .from('MITABLA1')
     .select('*')
-    .ilike('Nombre', `%${texto}%`);
+    .or(`Nombre.ilike.%${limpio}%,marca.ilike.%${limpio}%`)
+    .order('id', { ascending: true });
     // ilike = "like" insensible a mayúsculas/minúsculas.
     // los símbolos % significan "cualquier texto antes/después" —
     // equivalente a .toLowerCase().includes(texto)
+    // .or() busca la coincidencia en el modelo O en la marca
 
   if (error) return [];
   return data;

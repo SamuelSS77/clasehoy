@@ -1,17 +1,18 @@
 /* ==========================================================================
    DISEÑO COMPLETO Y MINIMALISTA: FONDO + BOTONES + FORMULARIO
-   Concepto: "Todo a Mil" actual, minimalista y fresco (Azul vibrante + Amarillo)
+   Concepto: "Rough Street" — tienda de sneakers, negro asfalto + hueso + naranja señal
+   (Se conservan los nombres de variables originales; solo cambian sus valores)
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Antonio:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  --bg-page: #cddff4;         /* Fondo azul hielo fresco (como el marco de la referencia) */
-  --blue-main: #1d56b8;       /* Azul vibrante Todo a Mil */
-  --blue-deep: #123a82;       /* Azul profundo para contraste */
-  --blue-ice: #e8f1ff;        /* Azul hielo claro para cajas y resultados */
-  --yellow-main: #ffe100;     /* Amarillo Todo a Mil luminoso */
-  --yellow-hover: #ffea47;
+  --bg-page: #e7e3da;         /* Fondo hueso / concreto claro */
+  --blue-main: #1a1a1a;       /* Negro asfalto (formulario y cards) */
+  --blue-deep: #0d0d0d;       /* Negro profundo para contraste */
+  --blue-ice: #f3f0ea;        /* Hueso claro para inputs y cajas */
+  --yellow-main: #ff5a1f;     /* Naranja señal Rough Street */
+  --yellow-hover: #ff7a47;
   --white: #ffffff;
 }
 
@@ -24,7 +25,7 @@ body {
   min-height: 100vh;
   padding: 28px 20px 48px;
   background-color: var(--bg-page);
-  background-image: radial-gradient(circle at 50% 0%, #e3effd 0%, var(--bg-page) 75%);
+  background-image: radial-gradient(circle at 50% 0%, #f4f1ea 0%, var(--bg-page) 75%);
   font-family: 'Plus Jakarta Sans', sans-serif;
   color: var(--blue-deep);
   display: flex;
@@ -44,7 +45,7 @@ body {
   color: var(--white);
   border-left: 6px solid var(--yellow-main);
   clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
-  box-shadow: 0 12px 28px rgba(18, 58, 130, 0.18);
+  box-shadow: 0 12px 28px rgba(13, 13, 13, 0.18);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -120,7 +121,7 @@ body {
   font-family: 'Space Mono', monospace;
   font-size: 0.78rem;
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
-  box-shadow: 0 8px 20px rgba(18, 58, 130, 0.15);
+  box-shadow: 0 8px 20px rgba(13, 13, 13, 0.15);
 }
 
 #notificacion:empty {
@@ -138,7 +139,7 @@ body {
   color: var(--white);
   border-top: 5px solid var(--yellow-main);
   clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
-  box-shadow: 0 18px 40px rgba(18, 58, 130, 0.24);
+  box-shadow: 0 18px 40px rgba(13, 13, 13, 0.24);
 }
 
 /* Cabecera del formulario */
@@ -184,7 +185,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 1.15rem;
-  background: rgba(255, 225, 0, 0.1);
+  background: rgba(255, 90, 31, 0.1);
   flex-shrink: 0;
 }
 
@@ -234,7 +235,7 @@ body {
 }
 
 #form-producto input::placeholder {
-  color: rgba(18, 58, 130, 0.45);
+  color: rgba(13, 13, 13, 0.45);
   font-weight: 400;
 }
 
@@ -319,7 +320,7 @@ body {
   flex-wrap: wrap;
   margin-bottom: 18px;
   padding-bottom: 14px;
-  border-bottom: 2px solid rgba(18, 58, 130, 0.15);
+  border-bottom: 2px solid rgba(13, 13, 13, 0.15);
 }
 
 .toolbar-kicker {
@@ -363,7 +364,7 @@ body {
 
 .search-box input:focus {
   border-color: var(--blue-deep);
-  box-shadow: 0 4px 14px rgba(18, 58, 130, 0.15);
+  box-shadow: 0 4px 14px rgba(13, 13, 13, 0.15);
 }
 
 .cards-grid {
@@ -393,10 +394,10 @@ body {
   position: relative;
   background: var(--blue-main);
   color: var(--white);
-  border: 2px solid rgba(255, 225, 0, 0.25);
+  border: 2px solid rgba(255, 90, 31, 0.25);
   border-top: 4px solid var(--yellow-main);
   border-radius: 4px;
-  box-shadow: 0 12px 24px rgba(18, 58, 130, 0.22);
+  box-shadow: 0 12px 24px rgba(13, 13, 13, 0.22);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -417,7 +418,7 @@ body {
   background: linear-gradient(
     115deg,
     transparent 0%,
-    rgba(255, 225, 0, 0.16) 50%,
+    rgba(255, 90, 31, 0.16) 50%,
     transparent 100%
   );
   pointer-events: none;
@@ -429,9 +430,9 @@ body {
   border-color: var(--yellow-main);
   box-shadow:
     0 0 0 1px var(--yellow-main),
-    0 0 18px rgba(255, 225, 0, 0.75),
-    inset 0 0 12px rgba(255, 225, 0, 0.22),
-    0 18px 32px rgba(18, 58, 130, 0.35);
+    0 0 18px rgba(255, 90, 31, 0.75),
+    inset 0 0 12px rgba(255, 90, 31, 0.22),
+    0 18px 32px rgba(13, 13, 13, 0.35);
 }
 
 .producto-card:hover::after {
@@ -460,7 +461,7 @@ body {
 }
 
 .producto-card:hover .card-stock {
-  box-shadow: 0 0 10px rgba(255, 225, 0, 0.65);
+  box-shadow: 0 0 10px rgba(255, 90, 31, 0.65);
 }
 
 .card-media {
@@ -477,7 +478,7 @@ body {
 }
 
 .producto-card:hover .card-media {
-  border-color: rgba(255, 225, 0, 0.65);
+  border-color: rgba(255, 90, 31, 0.65);
 }
 
 .card-img {
@@ -566,7 +567,7 @@ body {
   transform: rotate(45deg);
   background: var(--yellow-main);
   color: var(--blue-deep);
-  box-shadow: 0 0 12px rgba(255, 225, 0, 0.7);
+  box-shadow: 0 0 12px rgba(255, 90, 31, 0.7);
 }
 
 /* Botones de acciones CRUD (UPDATE y DELETE) en cada Card */
@@ -606,3 +607,109 @@ body {
   border: 1px solid rgba(255, 155, 155, 0.4);
 }
 
+
+/* ==========================================================================
+   DETALLES ROUGH STREET: badge, marca, colorway, tallas y precio USD
+   ========================================================================== */
+.card-media {
+  position: relative;
+  background: var(--white);
+}
+
+.card-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  background: var(--yellow-main);
+  color: var(--blue-deep);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+}
+
+.card-stock-bajo {
+  background: #ff2d2d;
+  color: var(--white);
+}
+
+.card-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yellow-main);
+  margin-bottom: 4px;
+}
+
+.card-colorway {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(243, 240, 234, 0.6);
+  margin-bottom: 8px;
+}
+
+.card-tallas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.card-tallas span {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  min-width: 30px;
+  text-align: center;
+  padding: 3px 5px;
+  border: 1px solid rgba(243, 240, 234, 0.28);
+  color: var(--blue-ice);
+}
+
+.card-precio-usd {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(243, 240, 234, 0.55);
+}
+
+/* ==========================================================================
+   VISTA PÚBLICA vs MODO ADMIN
+   Sin la clase .modo-admin en <body> (visitantes) se oculta el formulario
+   y el catálogo ocupa todo el ancho.
+   ========================================================================== */
+body:not(.modo-admin) .panel-formulario,
+body:not(.modo-admin) .admin-pill {
+  display: none;
+}
+
+body:not(.modo-admin) .main-layout {
+  grid-template-columns: 1fr;
+}
+
+.header-stats {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-pill {
+  background: var(--white);
+}
+
+.link-cuenta {
+  background: transparent;
+  color: var(--yellow-main);
+  border: 1.5px solid var(--yellow-main);
+  text-decoration: none;
+  clip-path: none;
+}
+
+.link-cuenta:hover {
+  background: var(--yellow-main);
+  color: var(--blue-deep);
+}

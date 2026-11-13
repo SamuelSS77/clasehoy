@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prueba Supabase</title>
+  <title>Rough Street | Sneakers</title>
   <link rel="stylesheet" href="css/prueba.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -13,11 +13,13 @@
   <!-- ENCABEZADO PRINCIPAL -->
   <header class="top-header">
     <div class="brand-block">
-      <span class="brand-kicker">SUPABASE CRUD // MITABLA1</span>
-      <h1>TODO A MIL <span>CATÁLOGO</span></h1>
+      <span class="brand-kicker">SNEAKERS &amp; STREETWEAR // SUPABASE</span>
+      <h1>ROUGH <span>STREET</span></h1>
     </div>
     <div class="header-stats">
-      <span id="contador-productos" class="stat-pill">0 PRODUCTOS</span>
+      <a href="cliente.html" class="stat-pill link-cuenta">MI CUENTA ↗</a>
+      <span class="stat-pill admin-pill">MODO ADMIN</span>
+      <span id="contador-productos" class="stat-pill">0 PARES</span>
     </div>
   </header>
 
@@ -28,42 +30,83 @@
       <form id="form-producto">
         <div class="form-header">
           <div>
-            <span class="form-kicker">TODO A MIL // NUEVO ITEM</span>
-            <h2>AGREGAR PRODUCTO</h2>
+            <span class="form-kicker">ROUGH STREET // NUEVO DROP</span>
+            <h2>AGREGAR SNEAKER</h2>
           </div>
-          <div class="form-badge-circle" title="Todo a Mil">↗</div>
-        </div>
-
-        <div class="form-field full">
-          <label for="input-nombre">Nombre <span>01</span></label>
-          <input type="text" id="input-nombre" placeholder="Ej: Mandarinas" required />
+          <div class="form-badge-circle" title="Rough Street">↗</div>
         </div>
 
         <div class="form-row">
           <div class="form-field">
-            <label for="input-precio">Precio <span>02</span></label>
-            <input type="number" id="input-precio" placeholder="Ej: 350000" min="0" step="any" required />
+            <label for="input-marca">Marca <span>01</span></label>
+            <input type="text" id="input-marca" placeholder="Ej: Nike" required />
           </div>
 
           <div class="form-field">
-            <label for="input-unidades">Unidades <span>03</span></label>
-            <input type="number" id="input-unidades" placeholder="Ej: 50" min="0" step="1" required />
+            <label for="input-sku">SKU <span>02</span></label>
+            <input type="text" id="input-sku" placeholder="Ej: NK-DNK-PND-01" />
           </div>
         </div>
 
         <div class="form-field full">
-          <label for="input-descripcion">Descripción <span>04</span></label>
-          <input type="text" id="input-descripcion" placeholder="Ej: Fruta cítrica" />
+          <label for="input-nombre">Modelo <span>03</span></label>
+          <input type="text" id="input-nombre" placeholder="Ej: Nike Dunk Low Retro 'Panda'" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="input-colorway">Colorway <span>04</span></label>
+            <input type="text" id="input-colorway" placeholder="Ej: White / Black" />
+          </div>
+
+          <div class="form-field">
+            <label for="input-categoria">Estilo <span>05</span></label>
+            <input type="text" id="input-categoria" placeholder="Ej: Skate / Lifestyle" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="input-precio">Precio COP <span>06</span></label>
+            <input type="number" id="input-precio" placeholder="Ej: 480000" min="0" step="any" required />
+          </div>
+
+          <div class="form-field">
+            <label for="input-precio-usd">Precio USD <span>07</span></label>
+            <input type="number" id="input-precio-usd" placeholder="Ej: 115" min="0" step="any" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="input-unidades">Stock <span>08</span></label>
+            <input type="number" id="input-unidades" placeholder="Ej: 24" min="0" step="1" required />
+          </div>
+
+          <div class="form-field">
+            <label for="input-badge">Badge <span>09</span></label>
+            <input type="text" id="input-badge" placeholder="Ej: Best Seller" />
+          </div>
         </div>
 
         <div class="form-field full">
-          <label for="input-imagen">URL de la imagen <span>05</span></label>
+          <label for="input-tallas">Tallas US <span>10</span></label>
+          <input type="text" id="input-tallas" placeholder="Ej: 7, 7.5, 8, 8.5, 9" />
+        </div>
+
+        <div class="form-field full">
+          <label for="input-descripcion">Descripción <span>11</span></label>
+          <input type="text" id="input-descripcion" placeholder="Ej: Silueta clásica de los 80..." />
+        </div>
+
+        <div class="form-field full">
+          <label for="input-imagen">URL de la imagen <span>12</span></label>
           <input type="text" id="input-imagen" placeholder="https://ejemplo.com/imagen.jpg" />
         </div>
 
         <button type="submit" id="btn-guardar-form">
-          <span id="texto-btn-form">GUARDAR PRODUCTO</span>
-          <span class="btn-tag">$ MIL &amp; MÁS ↗</span>
+          <span id="texto-btn-form">GUARDAR SNEAKER</span>
+          <span class="btn-tag">ROUGH ST ↗</span>
         </button>
         <button type="button" id="btn-cancelar-edicion" class="btn-cancelar-form" style="display: none;">
           CANCELAR EDICIÓN ✕
@@ -78,10 +121,10 @@
       <div class="catalogo-toolbar">
         <div class="toolbar-title">
           <span class="toolbar-kicker">INVENTARIO EN TIEMPO REAL</span>
-          <h2>PRODUCTOS REGISTRADOS</h2>
+          <h2>SNEAKERS DISPONIBLES</h2>
         </div>
         <div class="search-box">
-          <input type="search" id="input-buscar" placeholder="Buscar producto por nombre..." />
+          <input type="search" id="input-buscar" placeholder="Buscar por modelo o marca..." />
         </div>
       </div>
 
